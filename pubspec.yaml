@@ -1,0 +1,50 @@
+name: todo
+description: "A new Flutter project."
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Commonly used packages
+  cupertino_icons: ^1.0.8
+  http: ^1.2.2
+  provider: ^6.1.2
+  intl: ^0.19.0
+  table_calendar: ^3.1.2
+  flutter_local_notifications: ^17.2.3
+  timezone: ^0.9.4
+  html: ^0.15.4
+
+
+  # Additional helpful packages
+  shared_preferences: ^2.1.1 # for storing user data locally
+  path_provider: ^2.0.14 # to help find paths to the filesystem
+  url_launcher: ^6.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # Uncomment if you need linting rules
+  # flutter_lints: ^4.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  # Correct assets path
+  assets:
+    - assets/fonts/Roboto-Regular.ttf
+    - assets/fonts/Roboto-Bold.ttf
+
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
