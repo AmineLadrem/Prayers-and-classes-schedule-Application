@@ -1,6 +1,6 @@
 name: todo
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none' 
 
 version: 1.0.0+1
 
@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # Commonly used packages
   cupertino_icons: ^1.0.8
   http: ^1.2.2
   provider: ^6.1.2
@@ -20,25 +18,25 @@ dependencies:
   flutter_local_notifications: ^17.2.3
   timezone: ^0.9.4
   html: ^0.15.4
-
-
-  # Additional helpful packages
-  shared_preferences: ^2.1.1 # for storing user data locally
-  path_provider: ^2.0.14 # to help find paths to the filesystem
+  shared_preferences: ^2.1.1
+  path_provider: ^2.0.14 
   url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  # Uncomment if you need linting rules
-  # flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.0
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
 
 flutter:
-
   uses-material-design: true
 
-  # Correct assets path
   assets:
+    - assets/icons/app_icon.png
     - assets/fonts/Roboto-Regular.ttf
     - assets/fonts/Roboto-Bold.ttf
 

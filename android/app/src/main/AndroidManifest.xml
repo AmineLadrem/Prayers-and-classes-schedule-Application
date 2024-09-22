@@ -5,7 +5,7 @@
 
 
     <application
-        android:label="todo"
+        android:label="Prayers/Classes Schedule"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 
@@ -34,12 +34,10 @@
             android:name="flutterEmbedding"
             android:value="2" />
 
-        <!-- Receiver for local notifications -->
-        <receiver
-          android:name="com.dexterous.flutterlocalnotifications.FlutterLocalNotificationsPlugin"
-          android:exported="true" />
 
     </application>
+ 
+
 
     <!-- Queries for processing text -->
     <queries>
