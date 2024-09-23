@@ -180,13 +180,22 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
 
   void openGoogleMaps(String location) async {
     final encodedLocation = Uri.encodeComponent(location);
-    final googleMapsUrl =
-        'https://www.google.com/maps/search/?api=1&query=$encodedLocation';
+    final googleMapsUrl = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=$encodedLocation');
+    final googleMapsAppUrl = Uri.parse('geo:0,0?q=$encodedLocation');
 
-    if (await canLaunch(googleMapsUrl)) {
-      await launch(googleMapsUrl);
-    } else {
-      throw 'Could not launch Google Maps';
+    try {
+      // Try launching the Google Maps app first
+      if (await canLaunchUrl(googleMapsAppUrl)) {
+        await launchUrl(googleMapsAppUrl, mode: LaunchMode.externalApplication);
+      } else if (await canLaunchUrl(googleMapsUrl)) {
+        // If the app is not available, open the location in the browser
+        await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+      } else {
+        throw 'Could not launch Google Maps';
+      }
+    } catch (e) {
+      print('Error launching Google Maps: $e');
     }
   }
 
@@ -258,8 +267,9 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
                                     "${parsedDate.year}-${parsedDate.month.toString().padLeft(2, '0')}-${parsedDate.day.toString().padLeft(2, '0')}";
 
                                 final location =
-                                    classData['room']?.split(',')[0] ??
-                                        'Unknown Location';
+                                    (classData['room']?.split(',')[0] ??
+                                            'Unknown Location') +
+                                        ', Basel';
 
                                 return Card(
                                   margin: EdgeInsets.symmetric(
