@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:todo/services/prayer_time_service.dart';
 import 'package:todo/models/prayer_time.dart';
-import 'package:todo/services/notifications_service.dart';
 
 class PrayerTimesScreen extends StatefulWidget {
   @override
@@ -12,28 +11,24 @@ class PrayerTimesScreen extends StatefulWidget {
 }
 
 class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
-  late Future<PrayerTimes> prayerTimes;
+  late Future<List<PrayerTimes>> prayerTimes;
   Timer? _timer;
   int nextPrayerIndex = -1;
   String remainingTime = '';
-
-  final NotificationService _notificationService = NotificationService();
 
   @override
   void initState() {
     super.initState();
 
-    _initializeNotifications();
+    int currentMonth = DateTime.now().month;
+    int currentYear = DateTime.now().year;
 
-    String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now());
-
-    prayerTimes =
-        PrayerTimeService().getPrayerTimes('Basel-City', 'CH', currentDate);
+    prayerTimes = PrayerTimeService()
+        .getPrayerTimes('Basel', 'CH', currentMonth, currentYear);
 
     prayerTimes.then((times) {
       nextPrayerIndex = getNextPrayerIndex(times);
       startTimer(times);
-      _scheduleAllPrayerNotifications(times);
     });
   }
 
@@ -43,133 +38,37 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     super.dispose();
   }
 
-  Future<void> _initializeNotifications() async {
-    await _notificationService.flutterLocalNotificationsPlugin.initialize(
-      const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-      ),
-    );
-  }
-
-  void _scheduleAllPrayerNotifications(PrayerTimes times) {
-    _notificationService.schedulePrayerNotification('Fajr', times.fajr);
-    _notificationService.schedulePrayerNotification('Dhuhr', times.dhuhr);
-    _notificationService.schedulePrayerNotification('Asr', times.asr);
-    _notificationService.schedulePrayerNotification('Maghrib', times.maghrib);
-    _notificationService.schedulePrayerNotification('Isha', times.isha);
-  }
-
-  void startTimer(PrayerTimes times) {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      setState(() {
-        updateRemainingTime(times);
-      });
-    });
-  }
-
-  int getNextPrayerIndex(PrayerTimes times) {
-    final now = TimeOfDay.now();
-    List<TimeOfDay> prayerTimes = [
-      _parseTime(times.fajr),
-      _parseTime(times.dhuhr),
-      _parseTime(times.asr),
-      _parseTime(times.maghrib),
-      _parseTime(times.isha),
-    ];
-
-    for (int i = 0; i < prayerTimes.length; i++) {
-      if (now.hour < prayerTimes[i].hour ||
-          (now.hour == prayerTimes[i].hour &&
-              now.minute < prayerTimes[i].minute)) {
-        return i;
-      }
-    }
-    return 0;
-  }
-
-  TimeOfDay _parseTime(String time) {
-    final timeParts = time.split(':');
-    return TimeOfDay(
-      hour: int.parse(timeParts[0]),
-      minute: int.parse(timeParts[1]),
-    );
-  }
-
-  void updateRemainingTime(PrayerTimes times) {
-    if (nextPrayerIndex == -1) return;
-
-    final now = DateTime.now();
-    List<String> prayerTimesList = [
-      times.fajr,
-      times.dhuhr,
-      times.asr,
-      times.maghrib,
-      times.isha,
-    ];
-
-    final nextPrayerTimeStr = prayerTimesList[nextPrayerIndex];
-    final nextPrayerTime = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      int.parse(nextPrayerTimeStr.split(':')[0]),
-      int.parse(nextPrayerTimeStr.split(':')[1]),
-    );
-
-    Duration diff = nextPrayerTime.difference(now);
-
-    if (diff.isNegative) {
-      nextPrayerIndex = getNextPrayerIndex(times);
-    } else {
-      remainingTime = formatDuration(diff);
-    }
-  }
-
-  String formatDuration(Duration duration) {
-    final hours = duration.inHours.remainder(24).toString().padLeft(2, '0');
-    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
-    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
-    return "$hours:$minutes:$seconds";
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: Text(
-          'Prayer Times',
-          style: TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
-        ),
-        backgroundColor: Colors.teal,
+        title: Text('Prayer Times'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<PrayerTimes>(
+      body: Center(
+        child: FutureBuilder<List<PrayerTimes>>(
           future: prayerTimes,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return CircularProgressIndicator();
             } else if (snapshot.hasError) {
-              return Center(child: Text('Error: ${snapshot.error}'));
+              return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
-              final prayerTimes = snapshot.data!;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              final times = snapshot.data!;
+              return ListView(
+                padding: const EdgeInsets.all(16.0),
                 children: [
+                  _buildPrayerCard('Fajr', times[0].fajr, Icons.wb_sunny, 0),
                   _buildPrayerCard(
-                      'Fajr', prayerTimes.fajr, Icons.wb_twilight, 0),
+                      'Dhuhr', times[0].dhuhr, Icons.brightness_7, 1),
+                  _buildPrayerCard('Asr', times[0].asr, Icons.brightness_5, 2),
                   _buildPrayerCard(
-                      'Dhuhr', prayerTimes.dhuhr, Icons.wb_sunny, 1),
-                  _buildPrayerCard('Asr', prayerTimes.asr, Icons.wb_cloudy, 2),
-                  _buildPrayerCard('Maghrib', prayerTimes.maghrib,
-                      Icons.nightlight_round, 3),
+                      'Maghrib', times[0].maghrib, Icons.brightness_4, 3),
                   _buildPrayerCard(
-                      'Isha', prayerTimes.isha, Icons.brightness_3, 4),
+                      'Isha', times[0].isha, Icons.brightness_3, 4),
                 ],
               );
             } else {
-              return Center(child: Text('No data available'));
+              return Text('No data available');
             }
           },
         ),
@@ -177,7 +76,8 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
     );
   }
 
-  Widget _buildPrayerCard(String title, String time, IconData icon, int index) {
+  Widget _buildPrayerCard(
+      String title, DateTime time, IconData icon, int index) {
     final bool isNextPrayer = index == nextPrayerIndex;
 
     return Card(
@@ -200,7 +100,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              time,
+              DateFormat.jm().format(time),
               style: TextStyle(fontFamily: 'Roboto', fontSize: 16),
             ),
             if (isNextPrayer)
@@ -212,5 +112,40 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
         ),
       ),
     );
+  }
+
+  int getNextPrayerIndex(List<PrayerTimes> prayerTimes) {
+    DateTime now = DateTime.now();
+    if (now.isBefore(prayerTimes[0].fajr)) return 0;
+    if (now.isBefore(prayerTimes[0].dhuhr)) return 1;
+    if (now.isBefore(prayerTimes[0].asr)) return 2;
+    if (now.isBefore(prayerTimes[0].maghrib)) return 3;
+    if (now.isBefore(prayerTimes[0].isha)) return 4;
+    return -1;
+  }
+
+  void startTimer(List<PrayerTimes> prayerTimes) {
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      setState(() {
+        if (nextPrayerIndex == 0) {
+          remainingTime = calculateRemainingTime(prayerTimes[0].fajr);
+        } else if (nextPrayerIndex == 1) {
+          remainingTime = calculateRemainingTime(prayerTimes[0].dhuhr);
+        } else if (nextPrayerIndex == 2) {
+          remainingTime = calculateRemainingTime(prayerTimes[0].asr);
+        } else if (nextPrayerIndex == 3) {
+          remainingTime = calculateRemainingTime(prayerTimes[0].maghrib);
+        } else if (nextPrayerIndex == 4) {
+          remainingTime = calculateRemainingTime(prayerTimes[0].isha);
+        } else {
+          remainingTime = 'No upcoming prayers';
+        }
+      });
+    });
+  }
+
+  String calculateRemainingTime(DateTime nextPrayer) {
+    Duration duration = nextPrayer.difference(DateTime.now());
+    return '${duration.inHours}:${duration.inMinutes.remainder(60)}:${duration.inSeconds.remainder(60)}';
   }
 }
