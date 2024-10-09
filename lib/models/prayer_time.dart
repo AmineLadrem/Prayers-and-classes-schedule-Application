@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class PrayerTimes {
@@ -16,12 +18,15 @@ class PrayerTimes {
   });
 
   factory PrayerTimes.fromJson(Map<String, dynamic> json) {
-    if (json == null || !json.containsKey('timings')) {
+    if (json == null ||
+        !json.containsKey('data') ||
+        !json['data'].containsKey('timings')) {
       throw Exception('Invalid data structure: timings not found');
     }
 
-    final timings = json['timings'];
-    final date = DateTime.parse(json['date']['gregorian']['date']);
+    final timings = json['data']['timings'];
+    final dateString = json['data']['date']['gregorian']['date'];
+    final date = DateFormat('dd-MM-yyyy').parse(dateString);
 
     return PrayerTimes(
       fajr: _parseTime(date, timings['Fajr']),

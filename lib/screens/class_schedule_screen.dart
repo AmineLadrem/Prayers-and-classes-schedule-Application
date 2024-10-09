@@ -16,11 +16,9 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=286075',
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285199',
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285234',
-    'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285233',
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285222',
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285223',
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285229',
-    'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285231',
     'https://vorlesungsverzeichnis.unibas.ch/en/investigation?id=285221',
   ];
   CalendarFormat _calendarFormat = CalendarFormat.month;
