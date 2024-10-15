@@ -43,7 +43,11 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Prayer Times'),
+        title: Text(
+          'Prayers Times',
+          style: TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.teal,
       ),
       body: FutureBuilder<PrayerTimes>(
         future: prayerTimes,
@@ -95,7 +99,7 @@ class _PrayerTimesScreenState extends State<PrayerTimesScreen> {
                     isNextPrayer ? ' - $remainingTime' : '';
 
                 return Card(
-                  color: isNextPrayer ? Colors.lightBlueAccent : Colors.white,
+                  color: isNextPrayer ? Colors.teal : Colors.white,
                   child: ListTile(
                     leading: Icon(
                       prayerIcon,

@@ -18,9 +18,7 @@ class PrayerTimes {
   });
 
   factory PrayerTimes.fromJson(Map<String, dynamic> json) {
-    if (json == null ||
-        !json.containsKey('data') ||
-        !json['data'].containsKey('timings')) {
+    if (!json.containsKey('data') || !json['data'].containsKey('timings')) {
       throw Exception('Invalid data structure: timings not found');
     }
 

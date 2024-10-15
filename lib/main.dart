@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:todo/screens/prayer_times_screen.dart';
 import 'package:todo/screens/class_schedule_screen.dart';
+import 'package:todo/screens/task_schedule_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Prayer and Class Scheduler',
+      title: 'Amine App',
       theme: ThemeData(
         primarySwatch: Colors.teal,
       ),
@@ -31,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static final List<Widget> _screens = <Widget>[
     PrayerTimesScreen(),
     ClassScheduleScreen(),
+    TaskScheduleScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -53,9 +55,17 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.calendar_today),
             label: 'Class Schedule',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add_task_rounded),
+            label: 'Task Schedule',
+          ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.teal,
+        selectedItemColor: _selectedIndex == 0
+            ? Colors.teal
+            : _selectedIndex == 1
+                ? Color.fromARGB(255, 3, 165, 194)
+                : Color.fromARGB(255, 82, 26, 212),
         onTap: _onItemTapped,
       ),
     );

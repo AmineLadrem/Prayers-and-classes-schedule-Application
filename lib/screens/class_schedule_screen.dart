@@ -205,7 +205,7 @@ class _ClassScheduleScreenState extends State<ClassScheduleScreen> {
           'Classes Schedule',
           style: TextStyle(fontFamily: 'Roboto', fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(255, 3, 165, 194),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
